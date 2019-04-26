@@ -5,8 +5,8 @@
 #ifndef MATLOG2_PROOFCHECKER_H
 #define MATLOG2_PROOFCHECKER_H
 
-#include "parser.h"
-#include "expression.h"
+#include "../parser/parser.h"
+#include "../expression/expression.h"
 
 class ProofChecker {
     vector<string> axioms;

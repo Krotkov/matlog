@@ -5,10 +5,10 @@
 #ifndef PROOF_GEN_PROOFGENERATOR_H
 #define PROOF_GEN_PROOFGENERATOR_H
 
-#include "parser.h"
-#include "expression.h"
-#include "proofChecker.h"
-#include "Generator.h"
+#include "../parser/parser.h"
+#include "../expression/expression.h"
+#include "../proofChecker/proofChecker.h"
+#include "../generator/Generator.h"
 
 class ProofGenerator {
     bool truthTable[2][2][2];

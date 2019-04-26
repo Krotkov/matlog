@@ -6,7 +6,7 @@
 #define MATLOG2_PARSER_H
 
 #include <bits/stdc++.h>
-#include "expression.h"
+#include "../expression/expression.h"
 
 using namespace std;
 

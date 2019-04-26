@@ -3,9 +3,9 @@
 //
 
 #include "Generator.h"
-#include "expression.h"
-#include "proofChecker.h"
-#include "ProofGenerator.h"
+#include "../expression/expression.h"
+#include "../proofChecker/proofChecker.h"
+#include "../proofGenerator/ProofGenerator.h"
 
 using namespace std;
 

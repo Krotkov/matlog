@@ -5,7 +5,7 @@
 #ifndef GLIVENKO_GENERATOR_H
 #define GLIVENKO_GENERATOR_H
 
-#include "parser.h"
+#include "../parser/parser.h"
 #include <vector>
 #include <string>
 #include "string.h"

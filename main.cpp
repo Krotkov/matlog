@@ -1,6 +1,6 @@
 #include <iostream>
-#include "ProofGenerator.h"
-#include "Generator.h"
+#include "proofGenerator/ProofGenerator.h"
+#include "generator/Generator.h"
 
 int main() {
     //freopen("output.txt", "w", stdout);

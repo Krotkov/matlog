@@ -3,7 +3,7 @@
 //
 
 #include "proofChecker.h"
-#include "expression.h"
+#include "../expression/expression.h"
 
 ProofChecker::ProofChecker() {
     axioms.resize(10);

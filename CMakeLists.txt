@@ -3,4 +3,4 @@ project(proof_gen)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(proof_gen main.cpp Generator.cpp parser.cpp proofChecker.cpp expression.cpp ProofGenerator.cpp)
+add_executable(proof_gen main.cpp generator/Generator.cpp parser/parser.cpp proofChecker/proofChecker.cpp expression/expression.cpp proofGenerator/ProofGenerator.cpp)

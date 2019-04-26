@@ -3,7 +3,7 @@
 //
 
 #include "ProofGenerator.h"
-#include "Generator.h"
+#include "../generator/Generator.h"
 
 void append(vector<string> &a, const vector<string> &b) {
     int len = a.size();
