@@ -60,7 +60,10 @@ Expression* ExpressionParser::unary(string const &expression) {
             ans = implicationParse(expression);
             curToken = nextToken(expression);
             return ans;
+        default:
+            break;
     }
+    return nullptr;
 }
 
 Expression* ExpressionParser::andParse(string const &expression) {

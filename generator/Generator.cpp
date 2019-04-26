@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void Generator::deduction(vector<string> &proof, vector<Expression*>& parsed_proof, const string &A) {
+void Generator::deduction(vector<string> &proof, vector<Expression *> &parsed_proof, const string &A) {
     vector<string> ans;
     map<string, vector<int> > mp_r;
     std::unordered_map<string, int> num;
@@ -37,16 +37,16 @@ void Generator::deduction(vector<string> &proof, vector<Expression*>& parsed_pro
         if (equals(parsed_proof[i], strA)) {
             append(ans, AimplAlemm(stA));
         } else if (modus[i].first != -1) {
-                string help1 = "(" + stA + "->" + proof[modus[i].second] + ")";
-                string help2 = "(" + stA + "->(" + proof[modus[i].first] + "))";
-                ans.emplace_back('(' + help1 + "->(" + help2 + "->" + "(" + stA + "->" + proof[i] + ")))");
-                ans.emplace_back("(" + help2 + "->" + "(" + stA + "->" + proof[i] + "))");
-                ans.emplace_back("((" + stA + ")->(" + proof[i] + "))");
-            } else {
-                ans.emplace_back(proof[i]);
-                ans.emplace_back("((" + proof[i] + ")->((" + stA + ")->(" + proof[i] + ")))");
-                ans.emplace_back("((" + stA + ")->(" + proof[i] + "))");
-            }
+            string help1 = "(" + stA + "->" + proof[modus[i].second] + ")";
+            string help2 = "(" + stA + "->(" + proof[modus[i].first] + "))";
+            ans.emplace_back('(' + help1 + "->(" + help2 + "->" + "(" + stA + "->" + proof[i] + ")))");
+            ans.emplace_back("(" + help2 + "->" + "(" + stA + "->" + proof[i] + "))");
+            ans.emplace_back("((" + stA + ")->(" + proof[i] + "))");
+        } else {
+            ans.emplace_back(proof[i]);
+            ans.emplace_back("((" + proof[i] + ")->((" + stA + ")->(" + proof[i] + ")))");
+            ans.emplace_back("((" + stA + ")->(" + proof[i] + "))");
+        }
     }
     proof = ans;
 }
@@ -63,13 +63,14 @@ vector<string> Generator::contraposition(const string &A, const string &B) {
     ans.emplace_back("(!(" + strB + "))");
     ans.emplace_back("((" + strA + ")->(!(" + strB + ")))");
     ans.emplace_back("(!(" + strA + "))");
-    vector <Expression*> parsed_ans;
-    for (auto& st: ans) {
+    vector<Expression *> parsed_ans;
+    parsed_ans.reserve(ans.size());
+    for (auto &st: ans) {
         parsed_ans.emplace_back(parser.parse(st));
     }
     deduction(ans, parsed_ans, "!(" + strB + ")");
     parsed_ans.resize(0);
-    for (auto& st: ans) {
+    for (auto &st: ans) {
         parsed_ans.emplace_back(parser.parse(st));
     }
     deduction(ans, parsed_ans, "(" + strA + "->" + strB + ")");
@@ -233,10 +234,10 @@ vector<string> Generator::gennotAorB() {
     ans.emplace_back("((A|B)->!A)");
     ans.emplace_back("(!(A|B))");
     ProofChecker checker;
-    return checker.check("!A,!B|-!(A|B)",ans);
+    return checker.check("!A,!B|-!(A|B)", ans);
 }
 
-vector<string> Generator::AimplAlemm(const string& a) {
+vector<string> Generator::AimplAlemm(const string &a) {
     vector<string> ans;
     string help3 = "(" + a + "->" + a + ")";
     string help1 = "(" + a + "->" + help3 + ")";
@@ -282,8 +283,9 @@ vector<string> Generator::genAimplBuseNotA() {
     ans.emplace_back("(!!(B)->(B))");
     ans.emplace_back("B");
     ExpressionParser parser;
-    vector<Expression*> parsed_ans;
-    for (auto& st: ans) {
+    vector<Expression *> parsed_ans;
+    parsed_ans.reserve(ans.size());
+    for (auto &st: ans) {
         parsed_ans.emplace_back(parser.parse(st));
     }
     deduction(ans, parsed_ans, "A");

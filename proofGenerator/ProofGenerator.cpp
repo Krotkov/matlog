@@ -6,7 +6,6 @@
 #include "../generator/Generator.h"
 
 void append(vector<string> &a, const vector<string> &b) {
-    int len = a.size();
     for (auto &st: b) {
         a.emplace_back(st);
     }
@@ -22,7 +21,7 @@ vector<string> ProofGenerator::generateProof(const string &annotation) {
         if (usefulVars[0] == 1) ann += "A,";
         if (usefulVars[1] == 1) ann += "B,";
         if (usefulVars[2] == 1) ann += "C,";
-        if (ann.size() != 0) ann.pop_back();
+        if (!ann.empty()) ann.pop_back();
         ann += "|-" + whatToProof->toString();
         vector<string> ans = generateProofWithVars(usefulVars, true, false);
         ans.push_back(ann);
@@ -34,7 +33,7 @@ vector<string> ProofGenerator::generateProof(const string &annotation) {
         if (usefulVars[0] == 1) ann += "!A,";
         if (usefulVars[1] == 1) ann += "!B,";
         if (usefulVars[2] == 1) ann += "!C,";
-        if (ann.size() != 0) ann.pop_back();
+        if (!ann.empty()) ann.pop_back();
         ann += "|-" + whatToProof->toString();
         vector<string> ans = generateProofWithVars(usefulVars, false, true);
         ans.push_back(ann);
@@ -63,7 +62,6 @@ vector<string> ProofGenerator::generateProof(Expression *expression, bool valA, 
     auto secondSon = expression->getSecond();
     bool valFirst = firstSon->evaluate(valA, valB, valC);
     bool valSecond = secondSon == nullptr ? false : expression->getSecond()->evaluate(valA, valB, valC);
-    //bool result = expression->getValue(valFirst, valSecond);
     vector<string> proofFirst = generateProof(firstSon, valA, valB, valC);
     vector<string> proofSecond = generateProof(secondSon, valA, valB, valC);
     vector<string> proofThis = generator.generate(type, firstSon, secondSon, valFirst, valSecond);
@@ -80,7 +78,6 @@ vector<int> ProofGenerator::findUsefulVars(bool trueVal, bool falseVal) {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             for (int q = 0; q < 2; q++) {
-                //if (truthTable[i][j][q] == trueVal) {
                     if (num == -1 || num > i + j + q) {
                         vector<int> check = {i, j, q};
                         bool flag = true;
@@ -99,7 +96,6 @@ vector<int> ProofGenerator::findUsefulVars(bool trueVal, bool falseVal) {
                             ans = check;
                         }
                     }
-                //}
             }
         }
     }
@@ -163,7 +159,6 @@ vector<string> ProofGenerator::generateProofWithVars(const vector<int> &usefulVa
             }
         }
     }
-    return vector<string>();
 }
 
 vector<string>

@@ -11,8 +11,8 @@
 #include "../generator/Generator.h"
 
 class ProofGenerator {
-    bool truthTable[2][2][2];
-    Expression* whatToProof;
+    bool truthTable[2][2][2]{};
+    Expression* whatToProof{};
     Generator generator;
 
     vector<int> findUsefulVars(bool trueVal, bool falseVal);

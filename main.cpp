@@ -3,15 +3,14 @@
 #include "generator/Generator.h"
 
 int main() {
-    //freopen("output.txt", "w", stdout);
     string s;
     getline(cin, s);
     string A, B, C;
     string ans;
     string var;
-    for (int i = 0; i < s.size(); i++) {
-        if ((s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9') || s[i] == '\'') {
-            var += s[i];
+    for (char i : s) {
+        if ((i >= 'A' && i <= 'Z') || (i >= '0' && i <= '9') || i == '\'') {
+            var += i;
         } else {
             if (!var.empty()) {
                 if (var == A) ans += "A";
@@ -31,7 +30,7 @@ int main() {
                 }
                 var = "";
             }
-            ans += s[i];
+            ans += i;
         }
     }
     if (!var.empty()) {
@@ -73,21 +72,5 @@ int main() {
     for (auto& st: proof) {
         cout << st << "\n";
     }
-    /*ProofChecker checker;
-    auto a = checker.check(ann, proof);
-    for (auto b: a) {
-        cout << b << "\n";
-    }*/
-   /* int k = 0;
-    for (auto& st: proof) {
-        int bal = 0;
-        for (auto c: st) {
-            if (c == '(') bal++;
-            if (c == ')') bal--;
-            if (bal < 0) cout << k << "\n";
-        }
-        if (bal != 0) cout << k << "\n";
-        k++;
-    }*/
     return 0;
 }
