@@ -20,29 +20,27 @@ ProofChecker::ProofChecker() {
             "!!A->A"
     };
     whatToProof = nullptr;
-    ExpressionParser parser;
     for (int i = 0; i < 10; i++) {
-        parsedAxioms.push_back(parser.parse(axioms[i]));
+        parsedAxioms.push_back(ExpressionParser::parse(axioms[i]));
     }
 }
 
 vector<string> ProofChecker::check(const string& annotation, const vector<string>& proof) {
     pair<vector<string>, string> parsedAnnotation = prepareAnnotation(annotation);
     used_hyps.resize(parsedAnnotation.first.size(), false);
-    ExpressionParser parser;
     vector<Expression *> parsedHyp;
     for (const auto &i : parsedAnnotation.first) {
-        parsedHyp.push_back(parser.parse(i));
+        parsedHyp.push_back(ExpressionParser::parse(i));
     }
     vector<Expression *> parsedProof;
     string s;
     for (const auto & i : proof) {
-        Expression *exp = parser.parse(i);
+        Expression *exp = ExpressionParser::parse(i);
 
         parsedProof.push_back(exp);
     }
     hyps = parsedHyp;
-    Expression *result = parser.parse(parsedAnnotation.second);
+    Expression *result = ExpressionParser::parse(parsedAnnotation.second);
     whatToProof = result;
     return checkAndMinProof(parsedProof);
 }

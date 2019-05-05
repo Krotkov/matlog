@@ -11,30 +11,26 @@
 using namespace std;
 
 
-
 class ExpressionParser {
 
     enum class Token {
         OPEN_BRACKET, CLOSE_BRACKET, OR, AND, IMPLICATION, END, NOT, VARIABLE, BEGIN,
     };
-    Token curToken;
-    string variable;
-    int uk;
 
-    void skipWhiteSpaces(string const & expression);
+    static void skipWhiteSpaces(string const &expression, int &uk);
 
-    Token nextToken(string const & expression);
+    static Token nextToken(string const &expression, string &varName, int &uk);
 
-    Expression* unary(string const & expression);
+    static Expression *unary(string const &expression, Token &curToken, int &uk);
 
-    Expression* andParse(string const & expression);
+    static Expression *andParse(string const &expression, Token &curToken, int &uk);
 
-    Expression* orParse(string const & expression);
+    static Expression *orParse(string const &expression, Token &curToken, int &uk);
 
-    Expression* implicationParse(string const & expression);
+    static Expression *implicationParse(string const &expression, Token &curToken, int &uk);
 
 public:
-    Expression* parse(string const & expression);
+    static Expression *parse(string const &expression);
 };
 
 #endif //MATLOG2_PARSER_H

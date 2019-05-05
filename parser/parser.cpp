@@ -4,14 +4,14 @@
 
 #include "parser.h"
 
-void ExpressionParser::skipWhiteSpaces(string const &expression) {
+void ExpressionParser::skipWhiteSpaces(string const &expression, int& uk) {
     while (uk != expression.size() && (expression[uk] == ' ' || expression[uk] == '\n')) {
         uk++;
     }
 }
 
-ExpressionParser::Token ExpressionParser::nextToken(string const &expression) {
-    skipWhiteSpaces(expression);
+ExpressionParser::Token ExpressionParser::nextToken(string const &expression, string& varName, int& uk) {
+    skipWhiteSpaces(expression, uk);
     if (uk == expression.size()) {
         return Token::END;
     }
@@ -36,29 +36,30 @@ ExpressionParser::Token ExpressionParser::nextToken(string const &expression) {
             uk += 2;
             return Token::IMPLICATION;
         default:
-            variable = "";
+            varName = "";
             while (uk != expression.size() && ((expression[uk] >= 'a' && expression[uk] <= 'z') ||
                                                (expression[uk] >= 'A' && expression[uk] <= 'Z') ||
                                                (expression[uk] >= '0' && expression[uk] <= '9') ||
                                                (expression[uk] == '\''))) {
-                variable += expression[uk];
+                varName += expression[uk];
                 uk++;
             }
             return Token::VARIABLE;
     }
 }
 
-Expression* ExpressionParser::unary(string const &expression) {
+Expression* ExpressionParser::unary(string const &expression, Token& curToken, int& uk) {
     Expression* ans;
-    switch (curToken = nextToken(expression)) {
+    string varName;
+    switch (curToken = nextToken(expression, varName, uk)) {
         case Token::VARIABLE:
-            curToken = nextToken(expression);
-            return new Expression(Type::VARIABLE, variable);
+            curToken = nextToken(expression, varName, uk);
+            return new Expression(Type::VARIABLE, varName);
         case Token::NOT:
-            return new Expression(Type::NOT, unary(expression), nullptr);
+            return new Expression(Type::NOT, unary(expression, curToken, uk), nullptr);
         case Token::OPEN_BRACKET:
-            ans = implicationParse(expression);
-            curToken = nextToken(expression);
+            ans = implicationParse(expression, curToken, uk);
+            curToken = nextToken(expression, varName, uk);
             return ans;
         default:
             break;
@@ -66,12 +67,12 @@ Expression* ExpressionParser::unary(string const &expression) {
     return nullptr;
 }
 
-Expression* ExpressionParser::andParse(string const &expression) {
-    Expression* first = unary(expression);
+Expression* ExpressionParser::andParse(string const &expression, Token& curToken, int& uk) {
+    Expression* first = unary(expression, curToken, uk);
     while (true) {
         switch (curToken) {
             case Token::AND:
-                first = new Expression(Type::AND, first, unary(expression));
+                first = new Expression(Type::AND, first, unary(expression, curToken, uk));
                 continue;
             default:
                 return first;
@@ -79,12 +80,12 @@ Expression* ExpressionParser::andParse(string const &expression) {
     }
 }
 
-Expression* ExpressionParser::orParse(string const &expression) {
-    Expression* first = andParse(expression);
+Expression* ExpressionParser::orParse(string const &expression, Token& curToken, int& uk) {
+    Expression* first = andParse(expression, curToken, uk);
     while (true) {
         switch (curToken) {
             case Token::OR:
-                first = new Expression(Type::OR, first, andParse(expression));
+                first = new Expression(Type::OR, first, andParse(expression, curToken, uk));
                 continue;
             default:
                 return first;
@@ -92,12 +93,12 @@ Expression* ExpressionParser::orParse(string const &expression) {
     }
 }
 
-Expression* ExpressionParser::implicationParse(string const &expression) {
-    Expression* first = orParse(expression);
+Expression* ExpressionParser::implicationParse(string const &expression, Token& curToken, int& uk) {
+    Expression* first = orParse(expression, curToken, uk);
     while (true) {
         switch (curToken) {
             case Token::IMPLICATION:
-                first = new Expression(Type::IMPLICATION, first, implicationParse(expression));
+                first = new Expression(Type::IMPLICATION, first, implicationParse(expression, curToken, uk));
                 continue;
             default:
                 return first;
@@ -107,9 +108,9 @@ Expression* ExpressionParser::implicationParse(string const &expression) {
 }
 
 Expression* ExpressionParser::parse(string const &expression) {
-    uk = 0;
-    curToken = Token::BEGIN;
-    return implicationParse(expression);
+    int uk = 0;
+    Token curToken = Token::BEGIN;
+    return implicationParse(expression, curToken, uk);
 }
 
 

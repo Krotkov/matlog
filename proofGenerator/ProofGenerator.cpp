@@ -12,8 +12,7 @@ void append(vector<string> &a, const vector<string> &b) {
 }
 
 vector<string> ProofGenerator::generateProof(const string &annotation) {
-    ExpressionParser parser;
-    whatToProof = parser.parse(annotation);
+    whatToProof = ExpressionParser::parse(annotation);
     fillTruthTable();
     if (truthTable[1][1][1]) {
         vector<int> usefulVars = findUsefulVars(true, false);
@@ -57,11 +56,10 @@ vector<string> ProofGenerator::generateProof(Expression *expression, bool valA, 
     if (expression == nullptr) return vector<string>();
     auto type = expression->getType();
     if (type == Type::NOTHING) return vector<string>();
-    if (type == Type::VARIABLE) return generator.generateVar(expression, expression->evaluate(valA, valB, valC));
     auto firstSon = expression->getFirst();
     auto secondSon = expression->getSecond();
-    bool valFirst = firstSon->evaluate(valA, valB, valC);
-    bool valSecond = secondSon == nullptr ? false : expression->getSecond()->evaluate(valA, valB, valC);
+    bool valFirst = firstSon == nullptr ? false : firstSon->evaluate(valA, valB, valC);
+    bool valSecond = secondSon == nullptr ? false : secondSon->evaluate(valA, valB, valC);
     vector<string> proofFirst = generateProof(firstSon, valA, valB, valC);
     vector<string> proofSecond = generateProof(secondSon, valA, valB, valC);
     vector<string> proofThis = generator.generate(type, firstSon, secondSon, valFirst, valSecond);
@@ -103,8 +101,6 @@ vector<int> ProofGenerator::findUsefulVars(bool trueVal, bool falseVal) {
 }
 
 vector<string> ProofGenerator::generateProofWithVars(const vector<int> &usefulVars, bool trueVal, bool falseVal) {
-    //vector<string> mainProof = generateProof(whatToProof, true, true, true);
-    //return mainProof;
     string expr = whatToProof->toString();
     if (usefulVars[0] == 0) {
         vector<string> proofWithoutA = deleteHypVar(generateProof(whatToProof, trueVal, trueVal, trueVal),
@@ -166,22 +162,21 @@ ProofGenerator::deleteHypVar(const vector<string> &proofVar, const vector<string
     vector<string> proof;
     string expr = whatToProof->toString();
     vector<Expression *> parsed_proofVar;
-    ExpressionParser parser;
     parsed_proofVar.reserve(proofVar.size());
     for (auto &v: proofVar) {
-        parsed_proofVar.emplace_back(parser.parse(v));
+        parsed_proofVar.emplace_back(ExpressionParser::parse(v));
     }
     vector<Expression *> parsed_proofNotVar;
     parsed_proofNotVar.reserve(proofNotVar.size());
     for (auto &v: proofNotVar) {
-        parsed_proofNotVar.emplace_back(parser.parse(v));
+        parsed_proofNotVar.emplace_back(ExpressionParser::parse(v));
     }
     if (var[0] == '!') {
-        generator.deduction(const_cast<vector<string> &>(proofVar), parsed_proofVar, var);
-        generator.deduction(const_cast<vector<string> &>(proofNotVar), parsed_proofNotVar, var.substr(1));
+        Generator::deduction(const_cast<vector<string> &>(proofVar), parsed_proofVar, var);
+        Generator::deduction(const_cast<vector<string> &>(proofNotVar), parsed_proofNotVar, var.substr(1));
     } else {
-        generator.deduction(const_cast<vector<string> &>(proofVar), parsed_proofVar, var);
-        generator.deduction(const_cast<vector<string> &>(proofNotVar), parsed_proofNotVar, "!" + var);
+        Generator::deduction(const_cast<vector<string> &>(proofVar), parsed_proofVar, var);
+        Generator::deduction(const_cast<vector<string> &>(proofNotVar), parsed_proofNotVar, "!" + var);
     }
     append(proof, proofVar);
     append(proof, proofNotVar);
@@ -191,17 +186,16 @@ ProofGenerator::deleteHypVar(const vector<string> &proofVar, const vector<string
                 "(" + var + "->" + expr + ")->(!" + var + "->" + expr + ")->(" + var + "|!" + var + "->" + expr + ")");
         proof.emplace_back("(!" + var + "->" + expr + ")->(" + var + "|!" + var + "->" + expr + ")");
         proof.emplace_back("(" + var + "|!" + var + "->" + expr + ")");
-        help = generator.replaceOne(generator.AorNotA, var);
+        help = Generator::replace(generator.AorNotA, var);
     } else {
         string nVar = var.substr(1);
         proof.emplace_back(
                 "(" + nVar + "->" + expr + ")->(" + var + "->" + expr + ")->(" + nVar + "|" + var + "->" + expr + ")");
         proof.emplace_back("(" + var + "->" + expr + ")->(" + nVar + "|" + var + "->" + expr + ")");
         proof.emplace_back("(" + nVar + "|" + var + "->" + expr + ")");
-        help = generator.replaceOne(generator.AorNotA, nVar);
+        help = Generator::replace(generator.AorNotA, nVar);
     }
-    //proof.emplace_back("(" + var + "|!" + var + ")");
     append(proof, help);
-    proof.emplace_back(expr); // MUST FIX A & !A
+    proof.emplace_back(expr);
     return proof;
 }

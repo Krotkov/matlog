@@ -14,9 +14,7 @@ void Generator::deduction(vector<string> &proof, vector<Expression *> &parsed_pr
     map<string, vector<int> > mp_r;
     std::unordered_map<string, int> num;
     vector<pair<int, int> > modus;
-    ExpressionParser parser;
     for (int i = 0; i < proof.size(); i++) {
-        //parsed_proof.emplace_back(parser.parse(proof[i]));
         modus.emplace_back(-1, -1);
         string expr = parsed_proof[i]->toString();
         for (int &j : mp_r[expr]) {
@@ -31,7 +29,7 @@ void Generator::deduction(vector<string> &proof, vector<Expression *> &parsed_pr
             mp_r[parsed_proof[i]->getSecond()->toString()].push_back(i);
         }
     }
-    Expression *strA = parser.parse(A);
+    Expression *strA = ExpressionParser::parse(A);
     string stA = strA->toString();
     for (int i = 0; i < proof.size(); i++) {
         if (equals(parsed_proof[i], strA)) {
@@ -53,9 +51,8 @@ void Generator::deduction(vector<string> &proof, vector<Expression *> &parsed_pr
 
 vector<string> Generator::contraposition(const string &A, const string &B) {
     vector<string> ans;
-    ExpressionParser parser;
-    string strA = parser.parse(A)->toString();
-    string strB = parser.parse(B)->toString();
+    string strA = ExpressionParser::parse(A)->toString();
+    string strB = ExpressionParser::parse(B)->toString();
     ans.emplace_back("((" + strA + "->" + strB + ")->(" + strA + "->" + "!(" + strB + "))->!(" + strA + "))");
     ans.emplace_back("(" + strA + "->" + strB + ")");
     ans.emplace_back("((" + strA + "->!(" + strB + "))->(!(" + strA + ")))");
@@ -66,12 +63,12 @@ vector<string> Generator::contraposition(const string &A, const string &B) {
     vector<Expression *> parsed_ans;
     parsed_ans.reserve(ans.size());
     for (auto &st: ans) {
-        parsed_ans.emplace_back(parser.parse(st));
+        parsed_ans.emplace_back(ExpressionParser::parse(st));
     }
     deduction(ans, parsed_ans, "!(" + strB + ")");
     parsed_ans.resize(0);
     for (auto &st: ans) {
-        parsed_ans.emplace_back(parser.parse(st));
+        parsed_ans.emplace_back(ExpressionParser::parse(st));
     }
     deduction(ans, parsed_ans, "(" + strA + "->" + strB + ")");
     return ans;
@@ -89,16 +86,16 @@ vector<string> Generator::generate(Type type, Expression *first, Expression *sec
 vector<string> Generator::generateImpl(Expression *first, Expression *second, bool valFirst, bool valSecond) {
     string a = first->toString();
     string b = second->toString();
-    if (!valFirst) return replaceTwo(AimplBuseNotA, a, b);
-    if (valSecond) return replaceTwo(AimplBuseB, a, b);
-    return replaceTwo(notAimplB, a, b);
+    if (!valFirst) return replace(AimplBuseNotA, a, b);
+    if (valSecond) return replace(AimplBuseB, a, b);
+    return replace(notAimplB, a, b);
 }
 
 vector<string> Generator::generateNot(Expression *first, bool valFirst) {
     vector<string> ans;
     string expr = first->toString();
     if (valFirst) {
-        return replaceOne(notnotA, expr);
+        return replace(notnotA, expr);
     } else {
         ans.emplace_back("!" + expr);
     }
@@ -109,19 +106,19 @@ vector<string> Generator::generateAnd(Expression *first, Expression *second, boo
     string a = first->toString();
     string b = second->toString();
     if (valFirst && valSecond) {
-        return replaceTwo(AandB, a, b);
+        return replace(AandB, a, b);
     } else {
-        if (!valFirst) return replaceTwo(notAandBuseNotA, a, b);
-        else return replaceTwo(notAandBuseNotB, a, b);
+        if (!valFirst) return replace(notAandBuseNotA, a, b);
+        else return replace(notAandBuseNotB, a, b);
     }
 }
 
 vector<string> Generator::generateOr(Expression *first, Expression *second, bool valFirst, bool valSecond) {
     string a = first->toString();
     string b = second->toString();
-    if (valFirst) return replaceTwo(AorBuseA, a, b);
-    if (valSecond) return replaceTwo(AorBuseB, a, b);
-    return replaceTwo(notAorB, a, b);
+    if (valFirst) return replace(AorBuseA, a, b);
+    if (valSecond) return replace(AorBuseB, a, b);
+    return replace(notAorB, a, b);
 }
 
 vector<string> Generator::generateVar(Expression *first, bool valFirst) {
@@ -189,7 +186,7 @@ Generator::Generator() {
     notAimplB = gennotAimplB();
 }
 
-vector<string> Generator::replaceTwo(const vector<string> &proof, const string &A, const string &B) {
+vector<string> Generator::replace(const vector<string> &proof, const string &A, const string &B) {
     vector<string> ans;
     for (const auto &st: proof) {
         string e;
@@ -203,18 +200,6 @@ vector<string> Generator::replaceTwo(const vector<string> &proof, const string &
     return ans;
 }
 
-vector<string> Generator::replaceOne(const vector<string> &proof, const string &A) {
-    vector<string> ans;
-    for (const auto &st: proof) {
-        string e;
-        for (auto c: st) {
-            if (c == 'A') e += A;
-            else e += c;
-        }
-        ans.emplace_back(e);
-    }
-    return ans;
-}
 
 vector<string> Generator::gennotAorB() {
     vector<string> ans;
@@ -222,9 +207,9 @@ vector<string> Generator::gennotAorB() {
     ans.emplace_back("!B");
     ans.emplace_back("(((A|B)->A)->((A|B)->!A)->(!(A|B)))");
     ans.emplace_back("((A->A)->(B->A)->((A|B)->A))");
-    vector<string> imp1 = replaceTwo(AimplBuseNotA, "A", "A");
+    vector<string> imp1 = replace(AimplBuseNotA, "A", "A");
     append(ans, imp1);
-    imp1 = replaceTwo(AimplBuseNotA, "B", "A");
+    imp1 = replace(AimplBuseNotA, "B", "A");
     append(ans, imp1);
     ans.emplace_back("((B->A)->((A|B)->A))");
     ans.emplace_back("((A|B)->A)");
@@ -282,11 +267,10 @@ vector<string> Generator::genAimplBuseNotA() {
     ans.emplace_back("!!(B)");
     ans.emplace_back("(!!(B)->(B))");
     ans.emplace_back("B");
-    ExpressionParser parser;
     vector<Expression *> parsed_ans;
     parsed_ans.reserve(ans.size());
     for (auto &st: ans) {
-        parsed_ans.emplace_back(parser.parse(st));
+        parsed_ans.emplace_back(ExpressionParser::parse(st));
     }
     deduction(ans, parsed_ans, "A");
     ProofChecker checker;
